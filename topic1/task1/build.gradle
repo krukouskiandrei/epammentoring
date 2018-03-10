@@ -1,0 +1,51 @@
+plugins {
+    id 'org.asciidoctor.convert' version '1.5.6' apply false
+    id 'com.gradle.build-scan' version '1.12.1'
+}
+
+allprojects {
+    repositories {
+        jcenter()
+    }
+}
+
+subprojects {
+    version = '1.0'
+}
+
+configure(subprojects.findAll {it.name == 'greeter' || it.name == 'groovylibrary'}){
+    apply plugin : 'groovy'
+
+    dependencies {
+        testCompile 'org.spockframework:spock-core:1.0-groovy-2.4', {
+            exclude module : 'groovy-all'
+        }
+    }
+}
+
+buildScan {
+    licenseAgreementUrl = 'https://gradle.com/terms-of-service'
+    licenseAgree = 'yes'
+}
+
+def prodProf = 'prod'
+def devProf = 'dev'
+def stageProf = 'stage'
+def localProf = 'local'
+def currentProf;
+
+if(project.hasProperty('prod')) {
+    currentProf = prodProf
+    apply from: rootProject.file('gradle/prod.gradle')
+} else if(project.hasProperty('dev')) {
+    currentProf = devProf
+    apply from: rootProject.file('gradle/dev.gradle')
+} else if(project.hasProperty('stage')) {
+    currentProf = stageProf
+    apply from: rootProject.file('gradle/stage.gradle')
+} else {
+    currentProf = localProf
+    apply from: rootProject.file('gradle/local.gradle')
+}
+
+println 'Using profile: "' + currentProf + '" for ' + project.getName()

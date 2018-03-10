@@ -1,0 +1,18 @@
+apply plugin : 'application'
+
+mainClassName = 'greeter.Greeter'
+
+dependencies {
+    compile project(':groovylibrary')
+}
+
+distZip {
+    from project(':docs').asciidoctor, {
+        into "${project.name}-${version}"
+    }
+}
+distTar {
+    from project(':docs').asciidoctor, {
+        into "${project.name}-${version}"
+    }
+}
